@@ -6,7 +6,7 @@ import {
   HttpStatus,
   UseGuards,
   Get,
-  Request,
+  Param,
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
 import { JwtAuthGuard } from './guards/jwtAuth.guard';
@@ -32,10 +32,16 @@ export class AuthController {
     return this.authService.signUp(signUpDto);
   }
 
+  @Post('expire-password-link')
+  passwordLinkExpire(@Param() param: any) {
+    // need to call it at front end to expire link
+    return this.authService.passwordLinkExpire(param.token);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    console.log('req:', req.user);
+  getProfile() {
+    // for demo
     return { status: 'success', messgae: 'this is private api' };
   }
 }

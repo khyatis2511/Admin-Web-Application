@@ -11,36 +11,45 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
-  email        String         @unique
-  name         String?
-  roles        String[]
-  password     String
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-  GroupHasUser GroupHasUser[]
-  Transaction  Transaction[]
+  id                     String         @id @default(auto()) @map("_id") @db.ObjectId
+  email                  String         @unique
+  name                   String?
+  roles                  String[]
+  password               String
+  passwordToken          String 
+  isPasswordTokenExpired Boolean        @default(false)
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @updatedAt
+  GroupHasUser           GroupHasUser[]
+  Transaction            Transaction[]
 }
 
 model Group {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   description  String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   GroupHasUser GroupHasUser[]
 }
 
 model GroupHasUser {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  group   Group   @relation(fields: [groupId], references: [id])
-  groupId String  @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
-  user    User    @relation(fields: [userId], references: [id])
-  userId  String  @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
-  isAdmin Boolean @default(false)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  group     Group    @relation(fields: [groupId], references: [id])
+  groupId   String   @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
+  isAdmin   Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Transaction {
-  id      String  @id @default(auto()) @map("_id") @db.ObjectId
-  text    String
-  user    User    @relation(fields: [userId], references: [id])
-  userId  String  @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  text      String
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String   @db.ObjectId // relation scalar field  (used in the `@relation` attribute above)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

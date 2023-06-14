@@ -5,44 +5,78 @@ import { PrismaService } from 'src/shared/modules/prisma/prisma.service';
 export class TransactionService {
   constructor(private prisma: PrismaService) {}
 
-  async createGroup(groupData, user): Promise<any> {
-    const result = await this.prisma.group.create({ data: groupData });
+  async createTransaction(text, user): Promise<any> {
+    const data = {
+      text,
+      userId: user.id,
+    };
+    const result = await this.prisma.transaction.create({ data });
     if (result) {
-      // temp adding 2 relation user for operation - after remove with actual requiement
-      const userResult = await this.prisma.groupHasUser.createMany({
-        data: [
-          { groupId: result.id, userId: user.id },
-          { groupId: result.id, userId: '6488ba30399f68816a4ae917' },
-        ],
-      });
-    }
-    if (result) {
-      return { status: 'success', message: 'Group created successfully' };
+      return { status: 'success', message: 'Transaction created successfully' };
     } else {
       return { status: 'error', message: 'Something went wrong' };
     }
   }
 
-  async assignAdmin(groupId, userId): Promise<any> {
-    const result = await this.prisma.groupHasUser.findFirst({
+  async viewTransaction(user): Promise<any> {
+    const result = await this.prisma.transaction.findMany({
       where: {
-        AND: [groupId, { userId }],
+        AND: [
+          {
+            userId: {
+              equals: user.id,
+            },
+          },
+          {
+            isDeleted: {
+              equals: false,
+            },
+          },
+        ],
       },
     });
     if (result) {
-      const updateOne = await this.prisma.groupHasUser.update({
-        where: {
-          id: result.id,
-        },
-        data: { isAdmin: true },
-      });
-      if (updateOne) {
-        return { status: 'success', message: 'Admin assigned successfully' };
-      } else {
-        return { status: 'error', message: 'Unable to assign admin' };
-      }
+      return {
+        status: 'success',
+        message: 'Transaction fetched successfully',
+        data: result,
+      };
     } else {
-      return { status: 'error', message: 'Unable to assign admin' };
+      return { status: 'error', message: 'Unable to get transaction.' };
+    }
+  }
+
+  async deleteTransaction(transactionId): Promise<any> {
+    // soft delete
+    const result = await this.prisma.transaction.update({
+      where: {
+        id: transactionId,
+      },
+      data: { isDeleted: true },
+    });
+    if (result) {
+      return { status: 'success', message: 'Transaction deleted successfully' };
+    } else {
+      return { status: 'error', message: 'Unable to delete transaction' };
+    }
+  }
+
+  async viewAllTransaction(): Promise<any> {
+    const result = await this.prisma.transaction.findMany({
+      where: {
+        isDeleted: {
+          equals: false,
+        },
+      },
+    });
+    if (result) {
+      return {
+        status: 'success',
+        message: 'Transaction fetched successfully',
+        data: result,
+      };
+    } else {
+      return { status: 'error', message: 'Unable to get transaction.' };
     }
   }
 }

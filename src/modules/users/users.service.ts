@@ -9,10 +9,14 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async findOne(email: string): Promise<User | undefined> {
-    // return this.users.find((user) => user.username === username);
     const result = await this.prisma.user.findFirst({
       where: { email: email },
     });
+    return result;
+  }
+
+  async createUserOrPowerUser(data): Promise<any> {
+    const result = await this.prisma.user.create({ data });
     return result;
   }
 }

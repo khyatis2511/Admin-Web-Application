@@ -7,7 +7,8 @@ import {
   UseGuards,
   Param,
   Request,
-  Patch,
+  Delete,
+  Get,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/guards/jwtAuth.guard';
 import { RolesGuard } from '../auth/guards/role.guard';
@@ -20,17 +21,37 @@ export class TransactionController {
   constructor(private transactionService: TransactionService) {}
 
   @HttpCode(HttpStatus.OK)
-  @Roles(Role.SuperAdmin)
+  @Roles(Role.User)
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Post('')
-  createGroup(@Body() groupDto: Record<string, any>, @Request() req) {
-    return this.transactionService.createGroup(groupDto, req.user);
+  createTransaction(
+    @Body() transactionDto: Record<string, any>,
+    @Request() req,
+  ) {
+    return this.transactionService.createTransaction(
+      transactionDto.text,
+      req.user,
+    );
   }
 
-  @Roles(Role.SuperAdmin)
+  @Roles(Role.User)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Patch('/:groupId/assign-admin')
-  assignAdmin(@Body() userDto: Record<string, any>, @Param() groupId: string) {
-    return this.transactionService.assignAdmin(groupId, userDto.userId);
+  @Get('user')
+  viewTransaction(@Request() req) {
+    return this.transactionService.viewTransaction(req.user);
+  }
+
+  @Roles(Role.User)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Delete('/:transactionId')
+  deleteTransaction(@Param() params: any) {
+    return this.transactionService.deleteTransaction(params?.transactionId);
+  }
+
+  @Roles(Role.SupportDesk)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Get('')
+  viewAllTransaction() {
+    return this.transactionService.viewAllTransaction();
   }
 }

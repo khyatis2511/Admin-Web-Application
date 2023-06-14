@@ -29,7 +29,7 @@ export class GroupController {
 
   @Roles(Role.SuperAdmin)
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Patch('/:groupId/assign-admin')
+  @Patch('/:groupId/admin')
   assignAdmin(@Body() userDto: Record<string, any>, @Param() groupId: string) {
     return this.groupService.assignAdmin(groupId, userDto.userId);
   }
