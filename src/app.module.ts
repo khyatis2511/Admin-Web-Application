@@ -20,13 +20,13 @@ import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handleba
     }),
     MailerModule.forRoot({
       transport: 'smtps://user@domain.com:pass@smtp.domain.com',
-      // template: {
-      //   dir: process.cwd() + '/templates/',
-      //   adapter: new HandlebarsAdapter(),
-      //   options: {
-      //     strict: true,
-      //   },
-      // },
+      template: {
+        dir: process.cwd() + '/templates/',
+        adapter: new HandlebarsAdapter(),
+        options: {
+          strict: true,
+        },
+      },
     }),
   ],
   controllers: [AppController],
